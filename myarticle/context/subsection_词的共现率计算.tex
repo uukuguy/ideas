@@ -1,0 +1,11 @@
+% !Mode:: "TeX:UTF-8"
+
+由定义 \ref{def1}可知，词的共现率是两个词在同一主题内同时出现的概率之和，然而在实际文本建模过程中， 主题是文本的隐含变量，无法准确获得。因此，通过统计两个词在文本中共现的次数计算它们的共现率。假设一个窗口单元（例如，一句话、一个段落）代表一个主题，文本空间中有$n$个窗口单元，则主题的先验概率为$P(t) = 1 / n$。当词$w$在窗口单元出现，则其后验概率为$P(w \mid t) = 1$。根据公式
+\ref{formula1}，如果词$w_i$和$w_j$共同出现在$x$个不同的窗口单元中，它们的联合概率为$P(w_i, w_j)= x / n$。因此词的共现率可以由公式 \ref{formula2}计算得出。
+
+\begin{equation}
+P(w_i, w_j) = \frac{\parallel Segmgnet(w_i, w_j) \parallel}{\parallel Segment \parallel}
+\label{formula2}
+\end{equation} 
+
+式中，$Segment(w_i, w_j)$表示文本空间中同时包含$w_i$和$w_j$的窗口单元集合，$Segment$表示文本空间中的窗口单元集合，$\parallel \cdot \parallel$表示集合中元素的个数。例如，将窗口单元设为一个自然段，则自然段内出现的词汇对视为它们的一次共现。

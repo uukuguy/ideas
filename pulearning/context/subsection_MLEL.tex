@@ -1,0 +1,109 @@
+% !Mode:: "TeX:UTF-8"
+
+\citet{AAAI113583}提出MLEL算法\cite{AAAI113583}，首先使用一个启发式方法(Heuristic Method)按可信度(Confidence)生成多级样本(Multi-level examples)，样本的数量和质量对训练一个高质量的分类器非常重要。难以同时保证准确率和召回率，必须在两者之间选择权衡。其次，使用加权支持向量机(WSVM)来不同对待多级训练样本。共分为五级：$GP$(Golden Positives)、$PP$(Potential Positives)、$SN$(String Negatives)、$RN$(Reliable Negatives)、$PN$(Potential
+Negatives)。正例度$PD$(Positive Degree)被用来裁决一个未标注样本是否正例样本。
+
+\begin{algorithm}[htb]
+\caption{MLEL($P,U$)}
+\label{alg:MLEL}
+\begin{algorithmic}[1]
+\REQUIRE positive documents $P$, unlabeled document $U$
+\ENSURE a text classifier
+\STATE Obtain positive feature set ($PF$) and word positive
+\STATE degree($PD_{word}$) for each feature using Positive Feature
+\STATE Selection algorithm.
+\STATE Use Multi-level Example Generation algorithm to
+\STATE obtain $GP, PP, SN, RN$ and $PN$.
+\STATE Train text classifier using WSVM.
+\RETURN 
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Positive Feature Selection}
+正例特征使用可以表达正例样本并能与负例样本区分开的词条。用两个统计标准量$Specialty$和$Popularity$来度量一个词条是否正例特征。
+当一个词条在正例样本集合$P$中出现的频率超过在混合集合中出的频率时，该词条更倾向地是一个正例特征。如下公式，当词条的$Specialty > 0.5$时，更倾向于是一个正例特征。
+
+\begin{equation}
+Specialty(w) = f(w,P)/(f(w,P) + f(w,U))
+\end{equation}
+
+假设集合$P$中两个词条具有相同的出现频率，其中在集合$P$中更多样本中出现的那个词条，相对另一个更倾向于正例特征。用信息熵$Ent(w,P)$来描述集合P中词条$w$的分布情况。
+
+\begin{equation}
+Popularity(w) = Ent(w,P) / Z
+\end{equation}
+
+$Z$是信息熵$Ent(w,P)$的最大值，可以取$log(n_p)$，$n_p$是集合P中样本总数。
+
+\begin{equation}
+Ent(w,P) = -\sum\limits_{i=1}^{n_p}NProb(d_i \mid w)log(NProb(d_i \mid w))
+\end{equation}
+
+\begin{equation}
+NProb(d_i \mid w) = \frac{Prob(d_i \mid w) / l_i}{\sum\limits_{j=1}^{n_p}Prob(d_j \mid w) / l_j} 
+\end{equation}
+
+\begin{equation}
+Prob(d_i \mid w) = f(w,d_i)/f(w,P) 
+\end{equation}
+
+\begin{equation}
+l_i = \sum\limits_{w \in d_i}f(w,d_i)
+\end{equation}
+
+\begin{equation}
+PD_{word}(w) = Specialty(w) + Popularity(w)
+\end{equation}
+
+判别条件满足$Popularity(w)$ > $\alpha$，$Specialty(w)$ > $\beta$，$PD_{word}(w)$ > $\gamma$时，词条w是一个正例特征。$\alpha$、$\beta$、$\gamma$分别是$Popularity$、$Specialty$、$PD_{word}$的判定阈值，经验值可以取实验中的平均值。
+
+\subsubsection{Multi-Level Example Generation}
+
+\begin{itemize}
+\item Document Positive Degree  
+
+样本正例度越大，该样本越倾向于是一个正例样本。
+
+\begin{equation}
+PD_{doc}(d_i) = \frac{\sum\limits_{w \in PF, w \in d_i}PD_{word}(w)}{log(l_i)}
+\end{equation}
+
+\item Multi-Level Positives Acquisition
+
+已有的正例训练样本集合P中的样本被称为$GP$(Golden Positives)。
+样本$PD_{doc}$大于集合P中所有样本$PD_{doc}$的平均值的，被称为$PP$(Potential Positives)。
+
+\begin{equation}
+PD_{doc}(d_x) > \overline{PD(P)} 
+\end{equation}
+
+\item Multi-Level Negatives Acquisition
+
+样本$PD_{doc}$ = 0，被称为$SN$(Strong Negatives)。通常是不包含任何正向特征的样本。
+样本$PD_{doc}$小等于集合U中所有样本$PD_{doc}$的平均值的，被称为$RN$(Reliable Negatives)。
+
+\begin{equation}
+0 < PD_{doc}(d_x) \leq \overline{PD(U)}
+\end{equation}
+
+集合M中刨除$PP$、$SN$、$RN$剩余的样本被称为$PN$(Potential Negatives)。经验表明，PN对训练分类器同样有用。
+
+\end{itemize}
+
+\subsubsection{Multi-Level Example Based Learning}
+
+使用加权支持向量机WSVM基于多级样本训练分类器，给样本分别赋予不同的权值。
+
+最小化: $\frac{1}{2}\left \| W \right \| ^2 + 
+        c_{+}^{'}\sum_{i \in GP}\xi_i +
+        c_{+}^{''}\sum_{i \in PP}\xi_i +
+        c_{-}^{'}\sum_{i \in SN}\xi_i +
+        c_{-}^{''}\sum_{i \in RN}\xi_i +
+        c_{-}^{'''}\sum_{i \in PN}\xi_i 
+        $
+
+优化目标: $y_i(w^Tx_i + b) \geq 1 - \xi_i (i = 1,2, \ldots, n)$
+
+$\xi_i$是松弛变量(slack variable)，用于允许误分类部分训练样本。$c_{+}$$c_{-}$等变量分别是$GP$、$PP$、$SN$、$RN$、$PN$的惩罚因子(Penalty Factor)，用于调整不同级别样本可信度造成的影响。通常正例样本数量远远低于 未标注样本集合中负例样本数量。
+
+

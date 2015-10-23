@@ -1,0 +1,26 @@
+% !Mode:: "TeX:UTF-8"
+
+与VSM的建模思想类似，CTVSM将文本表示为一个共现词组合的向量。设文档空间$D = \{d_1,d_2, \ldots,d_n\}$中包含$n$篇文档,在$D$上抽取出的共现词组合的集合为$C=\{c_1,c_2, \ldots,c_m \}$,其中$c_m$ 为抽取出的第$m$个共现词组合。则文档空间$D$可表示为一个$m \times n$的矩阵。
+
+\begin{equation}
+D = (d_1, d_2, \ldots, d_n)^T
+\end{equation}
+
+其中行向量$d_i=(c_{i1},c_{i2}, \ldots,c_{im} )$代表一篇文档，
+
+
+\begin{equation}
+d_i = (c_{i1}, c_{i2}, \ldots, c_{im})
+\end{equation}
+
+列向量$c_j = (c_{1j}, c_{2j}, \ldots,c_{nj})$代表一个共现词汇组合在各文档中 的分布情况。矩阵中的元素$c_{ij}$表示文档$d_i$中共现词汇组合$c_j$的分布情况。如果共现词汇组合出现则相应的权值为1，如果不出现，则相应权值为0。
+
+%\begin{equation}
+%c_{ij} = 
+%\begin{cases} 
+    %0 & c\_j \notin d\_i  \\\\
+    %1 & c\_j \in d\_i
+%\end{cases}
+%\end{equation}
+
+

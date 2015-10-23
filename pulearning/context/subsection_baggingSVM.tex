@@ -1,0 +1,19 @@
+% !Mode:: "TeX:UTF-8"
+
+\citet{Mordelet2014201}提出了bagging SVM算法\cite{Mordelet2014201}解决正例与未标识问题。
+
+\begin{algorithm}[htb]
+\caption{Inductive bagging PU learning}
+\label{alg:bagging_SVM}
+\begin{algorithmic}[1]
+\REQUIRE $P,U,K = $ size of bootstrap samples, $T = $ number of bootstraps.
+\ENSURE a function $f: X \to R$
+\FOR{ $t = 1$ to $T$ }
+    \STATE Draw a subsample $U_t$ of size $K$ from $U$.
+    \STATE Train a classifier $f_t$ to discriminate $P$ against $U_t$.
+\ENDFOR
+\RETURN $f = \frac{1}{T}\sum\limits_{t=1}^Tf_t$
+\end{algorithmic}
+\end{algorithm}
+
+

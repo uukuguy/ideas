@@ -1,0 +1,36 @@
+% !Mode:: "TeX:UTF-8"
+
+\documentclass[openright,oneside,master]{expreport}
+
+\begin{document}
+
+\reportnickname{resampling}
+\subject{重采样技术简明综述}
+
+% 前言页眉页脚样式
+\pagestyle{frontmatter}
+
+% 正文页码样式
+\mainmatter
+% 正文页眉页脚样式
+\pagestyle{mainmatter}
+
+% 正文
+\input{./context/resampling}
+
+% 参考文献
+%\include{reference}
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{参考文献}
+\nocite{*}
+\bibliography{ref/bibs_resampling}
+\cleardoublepage
+
+% 附录
+%\appendix
+%\include{data/appendix1-faq}
+%\include{data/appendix2-contactus}
+
+\end{document}
+

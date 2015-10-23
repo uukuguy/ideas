@@ -1,0 +1,29 @@
+% !Mode:: "TeX:UTF-8"
+
+当前主要的相关解决算法包括S-EM\cite{liu2002partially}、Roc-SVM\cite{li2003learning}、Biased-SVM\cite{1250918}、CR-SVM\cite{li2010negative}、LELC\cite{li2009positive}、MLEL\cite{AAAI113583}、SPUL\cite{xiao2011similarity}、auto-CiKL\cite{hu2012estimate}。其中S-EM、Roc-SVM、CR-SVM、PEBL等都 是采用两步骤策略：1) 自动从未标注数据集中识别负例样本，以扩大负例训练样本集合；2)用已有的正例训练样本和新识别出的负例训练样本来构建分类器。该方法的缺陷在于认为所有训练样本都具有同等的可信度。事实上，由于 已有的正例训练样本是人工标注的，是高可信的黄金数据(Golden Data)，而自动识别出的负例训练样本由于 不可避免的分类错误，可信度较低。Biased-SVM和MLEL在这方面都有相应的考虑和调整，Biased-SVM在正例训练样本较少时分类性能较差\cite{AAAI113583}。
+
+\begin{itemize}
+\item Biased-SVM\cite{1250918}
+
+\citet{1250918}综述了S-EM、PEBL、Roc-SVM，并提出新算法\cite{1250918}。将未标注集合M中的所有样本初始标注为负例，并以不同分类权重构建SVM。负例分类权重实验值0.01,0.03.0.05, ....,0.61，正例分类权重相对负例分类权重的倍数实验中取10,20,30, ..., 200。
+
+\item LELC\cite{li2009positive}
+
+\citet{li2009positive}首先用Spy-EM和Rocchio两种 方法找出可信负例样本交集NS，构建典型正例和负例原型，其次将模糊样本(Ambiguous Examples)聚类成微聚类(micro-cluster)，计算微聚类与正例原型和负例原型之间的余弦相似度，用Rocchio分类器判别微聚类为近似正例样本(likely positive examples)或近似负例样本(likely nagetive examples)，生成新的正例样本集合(原正例样本+近似正例样本)和负例样本集合(可信负例样本+近似负例样本)，最后构建最终的SVM分类器。
+
+\item MLEL\cite{AAAI113583}
+
+\citet{AAAI113583}提出了正例度(Positive Degree)的概念及算法\cite{AAAI113583}，可以计算出词条正例度(PDword)和文本正例度(PDdoc)。基于正例度已能较显著地(目测方式)从未标注集合中获得大量正例样本。根据文本正例度大小范围，将未标注集合中的样本分为多个级别的正例和负例样本，用WSVM构建分类器。
+
+\item SPUL\cite{xiao2011similarity} 
+
+\citet{xiao2011similarity}针对模糊样本(Ambiguous Examples. 不能明确判定为正例或负例的样本)提出相似度指标(similarity)。首先用与LELC相同的方法抽取可信负例样本集NS，并构建典型正例和负例原型，其次通过相似度权值计算方法（本地相似度权值和全局相似度权值）计算每个未标注样本的正例相似度和负例相似度，最后基于正例相本集PS，负例样本集NS以及模糊样本集US构建SVM分类器。
+
+\item auto-CiKL\cite{hu2012estimate}
+
+\citet{hu2012estimate}针对正例样本在集合P和集合M中不同的分布密度，造成各种 已有算法性能随之不同的现象，提出了估算未标注集合M中负例样本比例的算法，并根据估算的比例选择不同的算法构建分类器。
+
+
+
+\end{itemize}
+

@@ -1,0 +1,97 @@
+% !Mode:: "TeX:UTF-8"
+
+\citet{liu2002partially}提出的S-EM算法\cite{liu2002partially}是基于朴素贝叶斯(Navie Bayesian)分类和期望最大(EM)算法，算法细节来源于论文《Partially Supervised Classification of Text Documents》，针对只拥有可信正例样本(正例集合P)和未标记样本(混合集合M)，没有可信负例样本情况，基于"间谍"技术、朴素贝叶斯和EM算法。
+
+首先把所有未标记样本都认为是负例样本，学习得到一个贝叶斯分类器NB-C。用这个分类器NB-C分类未标注样本，超过阈值的被认为是正例样本，迭代创建新的NB-C直到稳定。
+
+\subsubsection{贝叶斯文本分类}
+
+给定训练文本集$D$，每一篇文本被看作是有序的词列表。我们用$w_{d_i,k}$表示文本$d_i$中位置$k$的词，每个词来自于词汇表$V = < w_1,w_2,\ldots,w_{\left | v \right |}>$。我们同时还有一个预定义类别集合$C = \{ c_1,c_2,\ldots,c_{\left | C \right |} \}$（二分类的情况下，$C = \{c_1, c_2\}$）。为了实现分类，需要计算后验概率$Pr[c_j \mid
+d_i]$，其中$c_j$是类别，$d_i$是文本。基于贝叶斯概率和多项式模型，可以得到类别概率$Pr[c_j]$（公式 \ref{pr_cj}）和拉普加斯平滑后的已知类别后词的条件概率$Pr[w_t \mid c_j$（公式 \ref{pr_wt_cj}）。
+
+\begin{equation}
+Pr\left [c_j \right ] = \sum\limits_iPr \left [ c_j \mid d_i \right ] / \left | D \right |
+\label{pr_cj}
+\end{equation}
+
+\begin{equation}
+Pr\left [w_t \mid c_j \right ] = \frac{1 + \sum\limits_{i=1}^{\left | D \right |}N(w_t,d_i)P(c_j \mid d_i)}{\left | V \right | + \sum\limits_{s=1}^{\left | V \right |}{\sum\limits_{i=1}^{\left | D \right |}N(w_s,d_i)P(c_j \mid d_i)}}
+\label{pr_wt_cj}
+\end{equation}
+
+其中，$N(w_t, d_i)$是词$w_t$出现在文本$d_i$中总次数，公式 \ref{pr_cj}中的$Pr[c_j \mid d_i] \in \{0,1\}$依赖于文本的类别标注。最后，假设词的概率是独立于类别的，我们得到公式 \ref{pr_cj_di}。
+
+\begin{equation}
+Pr\left [ c_j \mid d_i \right ] = \frac{Pr \left [ c_j \right]\prod\limits_{k=1}^{\left | d_i \right |}Pr \left [ w_{d_i,k} \mid c_j\right ]}{\sum\limits_{r=1}^{\left | C \right |} Pr \left [ C_r \right ]\prod\limits_{k=1}^{\left | d_i \right |} P(w_{d,k} \mid c_r)}
+\label{pr_cj_di}
+\end{equation}
+
+在朴素贝叶斯分类器中，文本类别由最高$Pr[c_j \mid d_i]$的类别确定。
+
+\subsubsection{EM算法}
+
+\subsubsection{步骤一：重新初始化(Reinitialization)}
+
+\paragraph{应用EM算法(I-EM)}
+初始化时，将正例样本集合$P$中所有样本标记为$c_1$类，即$Pr[c_1 \mid d_i]$ = 1, $Pr[c_2 \mid d_i]$ = 0，将未标记集合$M$中所有样本标记为$c_2$类，即$Pr[c_2 \mid d_j]$ = 1, $Pr[c_1 \mid d_j]$ = 0。此时构建了第一个朴素贝叶斯分类器NB-C。这个分类器被用于分类未标记集合$M$，使用公式 \ref{pr_cj_di}计算未标记集合$M$中每个文本的后验概率$Pr[c_1 \mid
+d_j]$，将此概率赋给$d_j$作为它的新的概率分类标记。所有正例文本的分类概率保持不变，即$Pr[c_1 \mid d_i]$ = 1。
+
+未标识集合$M$中所有$Pr[c_1 \mid d_j]$被修正后，同时还可计算出$Pr[w_t \mid c_k]$（公式 \ref{pr_wt_cj}）和$Pr[c_k]$（公式 \ref{pr_cj}），由此可以构建出新的NB-C分类器，下一迭代开始，直到$EM$收敛。整个过程被称为I-EM(initial EM)，详见算法 \ref{alg:iem}。
+
+
+\begin{algorithm}[htb]
+\caption{The I-EM algorithm with naive Bayesian classifier}
+\label{alg:iem}
+\begin{algorithmic}[1]
+\REQUIRE 混合集合$M$，正例集合$P$
+\STATE Build an initial naive Bayesian classifier NB-C using the document sets $M$ and $P$;
+\WHILE {classifier parameters change}
+\FOR {each $d_j \in M$}
+\STATE Compute $Pr[c_1 \mid d_j]$ using the current NB-C;
+\STATE // $Pr[c_2 \mid d_j] = 1 - Pr[c_1 \mid d_j]$
+\STATE Update $Pr[w_t \mid c_1]$ and $Pr[c_1]$ given the probabilistically assigned class for $d_j$($Pr[c_1 \mid d_j]$) and $P$ (a new NB-C is being built in the process);
+\ENDFOR
+\ENDWHILE
+\RETURN 
+\end{algorithmic}
+\end{algorithm}
+	未标记集合$M$中每个文本$d_j$最终的概率分类标记可以被用来从混合集合中识别出正类样本。经验显示，此方法的效果好于原始朴素贝叶斯分类方法。
+
+对于人工可以明显区分正负类的情况，I-EM算法可以有很好的效果。但对于人工较难区分正负类的情况，则效果欠佳，这是由于算法初始时强烈地偏向正类样本，因些还需要以下算法加以提升。
+
+\paragraph{将“间谍”文本加入混合集合中}
+
+经过I-EM后，我们有了一个很好的机会来识别混合集合M中的最近似负类样本。关键方法是从正类集合$P$中选取“间谍”样本到混合集合$M$中。从正类集合$P$中随机选取$x\%$样本（经验数据是$10\%$）组成间谍集合$S$，将其加入到混合集合$M$中。
+
+对集合$M + S$应用上面的I-EM算法后，间谍样本的概率分类标记被用于决定哪 些样本是最近似负类样本。设定一个阈值$t$，混合集合$M$中样本概率分类标记小于阈值$t$的样本集合是最近似负类样本集合$N$，混合集合中样本概率标记大于阈值$t$的样本集合（不包括间谍样本）是未标记样本集合$U$。具体算法流程图见算法 \ref{alg:ident_likely_negative}。
+
+
+\begin{algorithm}[htb]
+\caption{Identifying likely negative documents}
+\label{alg:ident_likely_negative}
+\begin{algorithmic}[1]
+\STATE $N = U = \phi$;
+\STATE $S = sample(P, s\%)$;
+\STATE $MS = M \cup S$;
+\STATE $P = P - S$;
+\STATE Assign every document $d_i$ in $P$ the class $c_1$;
+\STATE Assign every document $d_j$ in $MS$ the class $c_2$;
+\STATE Run I-EM($MS$, $P$);
+\STATE Classify each document $d_j$ in $MS$;
+\STATE Determine the probability threshold t using $S$;
+\FOR {each document $d_j$ in $M$}
+\IF {its probability $Pr{c_1 \mid d_j] < t}$ }
+\STATE $N = N \cup \{d_j\}$;
+\ELSE
+\STATE $U = U \cup \{d_j\}$;
+\ENDIF
+\ENDFOR
+\RETURN 
+\end{algorithmic}
+\end{algorithm}
+
+阈值$t$的计算：无噪声的情况下，取间谍集合中最小的概率分类标记，即$t = min\{Pr[c_1 \mid s_1],Pr[c_1 \mid s_2],\ldots,Pr[c_1 \mid s_k]\}$。但通常情况下都有噪声样本，这些噪声样本的概率分类标记可能为0或者远小于其它间谍样本。因此，可以定义一个噪声级别参数 $l$，间谍样本集合中$l\%$样本的概率分类标记小于阈值$t$。噪声级别$l$可以取值5,10,15,或20，经验值是$15\%$。
+
+
+
+

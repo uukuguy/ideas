@@ -1,0 +1,32 @@
+% !Mode:: "TeX:UTF-8"
+
+通常，文本中出现的词汇都是为了帮助作者表达其主题思想，只不过每个词与主题的相关程度不同。词汇有其所属主题域，相同主题域中的词汇共同出现在同一篇文档中的概率相对较高，因此利用词的共现现象可以判断词汇与主题之间的相关程度。
+
+假设文本空间$D$上有主题集合$T$和词汇集合$W$，其中，d$_i$ $\in D$代表第$i$篇文档，t$_k$ $\in T$代表文档空间中的第$k$个主题，$S(t_k)$为主题$t_k$的主题相关词集合，$w_m \in W$为文档中出现的词汇。在主题$t_k$出现的情况下，词汇$w_m$出现的条件概率可表示为$P(w_m \mid t_k)$。
+
+\begin{definition}[共现率]
+词汇$w_i$与$w_j$的共现率是指这两个词在同一文本空间单位中共同出现的概率，即它们在文本空间中的联合概率， \label{def1}如下式所示：
+\begin{equation}
+P(w_i, w_j) = \sum_{i \in T}P(t) P(w_i \mid t)P(w_j \mid t), \forall w_i, w_j \in W
+\label{formula1}
+\end{equation} 
+\end{definition}
+
+
+\begin{definition}[显著性事件]
+设满足$P(\cdot) > \theta$的事件，即发生概率较高的事件，被称为显著性事件。其中$\theta$为显著性判别标准，通常与语料库的规模以及主题在文本空间中的分布有关。 \label{def2}
+\end{definition}
+
+\begin{definition}[主题相关]
+当$P(w_m \mid t_k) \geq \theta$，即是显著性事件时，$w_m$是$t_k$的主题相关词汇，称为$w_m$与$t_k$主题相关。
+\end{definition} \label{def3}
+
+\begin{definition}[主题无关]
+当$P(w_m \mid t_k) < \theta$，即是非显著事件时，$w_m$不是$t_k$的主题相关词汇，称$w_m$与$t_k$主题无关。 \label{def4}
+\end{definition}
+
+\begin{corollary}
+如果两个词汇的共现为显著事件，则这两个词汇与某个共同的主题相关。即：当$P(w_i, w_j) \geq \theta$时，$\exists t_k$ 使得 $P(w_i \mid t_k) \geq \theta$ 且 $P(w_j \mid t_k) \geq \theta$。 \label{coro1}
+\end{corollary}
+
+由此推论 \ref{coro1}可知，如果两个词汇的共现率超过一定的阈值，则预示着这两个词较大可能是主题相关的。
