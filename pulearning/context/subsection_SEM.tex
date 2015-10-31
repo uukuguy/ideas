@@ -93,5 +93,20 @@ d_j]$，将此概率赋给$d_j$作为它的新的概率分类标记。所有正�
 阈值$t$的计算：无噪声的情况下，取间谍集合中最小的概率分类标记，即$t = min\{Pr[c_1 \mid s_1],Pr[c_1 \mid s_2],\ldots,Pr[c_1 \mid s_k]\}$。但通常情况下都有噪声样本，这些噪声样本的概率分类标记可能为0或者远小于其它间谍样本。因此，可以定义一个噪声级别参数 $l$，间谍样本集合中$l\%$样本的概率分类标记小于阈值$t$。噪声级别$l$可以取值5,10,15,或20，经验值是$15\%$。
 
 
+\subsubsection{步骤二：用样本集合$P$、$N$、$U$构建最终分类器(S-EM)}
 
+The step builds the final classifier. The $EM$ algorithm is again employed, with the document sets, $P$, $N$, and $U$. This step is carried out as follows 算法 \ref{alg:sem}.
+
+\begin{algorithm}[htb]
+\caption{S-EM algorithm}
+\label{alg:sem}
+\begin{algorithmic}[1]
+    \STATE Put all the spy documents $S$ back to the positive set $P$.
+    \STATE Assign every document in the positive set $P$ the fixed class label $c_1$, $Pr[c_1 \mid d_i] = 1$, which will not chage in each iteration of $EM$.
+    \STATE Assign each document $d_j$ in the likely negative set $N$ the initial class $c_2$, i.e., $P4[c_2 \mid \d_j] = 1$, which changes with each iteration of $EM$.
+    \STATE Each document $d_k$ in the unlabeled set $U$ is not assigned any label initially. At the end of the first iteration of $EM$, it will be assigned a probabilistic label, $Pr[c_1 \mid d_k]$. In subsequent iterations, the set $U$ will participate in $EM$ with its newly assigned probabilistic classes, e.g., $(Pr[c_1 \mid d_k])$.
+    \STATE Run the $EM$ algorithm using the document sets $P$, $N$, and $U$ until it conerges.
+    \RETURN the inal classifier.
+\end{algorithmic}
+\end{algorithm}
 

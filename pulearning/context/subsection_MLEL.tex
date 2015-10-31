@@ -1,7 +1,7 @@
 % !Mode:: "TeX:UTF-8"
 
 \citet{AAAI113583}提出MLEL算法\cite{AAAI113583}，首先使用一个启发式方法(Heuristic Method)按可信度(Confidence)生成多级样本(Multi-level examples)，样本的数量和质量对训练一个高质量的分类器非常重要。难以同时保证准确率和召回率，必须在两者之间选择权衡。其次，使用加权支持向量机(WSVM)来不同对待多级训练样本。共分为五级：$GP$(Golden Positives)、$PP$(Potential Positives)、$SN$(String Negatives)、$RN$(Reliable Negatives)、$PN$(Potential
-Negatives)。正例度$PD$(Positive Degree)被用来裁决一个未标注样本是否正例样本。
+Negatives)。正例度$PD$(Positive Degree)被用来裁决一个未标注样本是否正例样本。具体见算法 \ref{alg:MLEL}。
 
 \begin{algorithm}[htb]
 \caption{MLEL($P,U$)}

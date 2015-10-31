@@ -1,0 +1,19 @@
+% !Mode:: "TeX:UTF-8"
+
+\citet{li2003learning}提出了算法\cite{li2003learning}，在 Rocchio分类器中，构造一个原型向量来总结类$j$中的文档，每个待分类文档需要与每个类的原型向量计算相似度，这个待分类的文档很有可能属于相似度最大的类。原型向量构造见式 \ref{protocal_vector}
+
+\begin{equation}
+\overrightarrow{c_j} = \alpha \frac{1}{\left | c_j \right |}
+         \sum\limits_{\overrightarrow{d} \in c_j}\frac{\overrightarrow{d}}{\left \| \overrightarrow{d} \right \| } -
+         \beta \frac{1}{\left | D - c_j \right |}
+         \sum\limits_{\overrightarrow{d} \in D - c_j} 
+         \frac{\overrightarrow{d}}{\left \| \overrightarrow{d} \right \|}
+\label{protocal_vector}
+\end{equation}
+
+其中，$\left \| \overrightarrow{d} \right \|$代表向量$\overrightarrow{d}$的欧几里得距离，$D$代表训练集，$c_j$是识别出的相关文档的集合，$\alpha$和$\beta$这两个参数用来调整识别相关文档和不相关文档的效果，试验表明两个参数的合理取值$\alpha$和$\beta$分别设置为16和4。
+
+paragraph{从未标注样本集$M$中识别尽可能多包含负例样本的可信负例样本集$RN$}
+
+paragraph{在可信正例样本集$P$和可信负例样本集$RN$上迭代构建分类器，从中选择最佳分类器}
+
